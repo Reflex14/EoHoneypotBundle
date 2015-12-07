@@ -22,6 +22,8 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Eo\HoneypotBundle\Util\LegacyFormHelper;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class HoneypotType extends AbstractType
@@ -74,7 +76,7 @@ class HoneypotType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'required' => false,
@@ -89,18 +91,22 @@ class HoneypotType extends AbstractType
             )
         ));
     }
+    
+    // BC for SF < 2.7
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $this->configureOptions($resolver);
+    }
 
     /**
      * {@inheritdoc}
      */
     public function getParent()
     {
-        return 'text';
+        return LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\TextType');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    // BC for SF < 3.0
     public function getName()
     {
         return 'honeypot';
